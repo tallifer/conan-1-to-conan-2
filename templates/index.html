@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Conan 2 Migration Tracker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>Conan 2 Migration Tracker</h1>
+  <form action="{{ url_for('rescan') }}" method="post">
+    <button type="submit">Rescan libraries</button>
+  </form>
+  <p><a href="{{ url_for('graph') }}">View dependency graph</a></p>
+
+  {% for warn in cycle_warning %}<div class="warn">{{ warn }}</div>{% endfor %}
+
+  <div class="summary">
+    <div>Total libraries: {{ summary.total }}</div>
+    <div>Done: {{ summary.done }}</div>
+    <div>In progress: {{ summary.in_progress }}</div>
+    <div>Not started: {{ summary.not_started }}</div>
+    <div>Blocked: {{ summary.blocked }}</div>
+    <div>Ready to migrate: {{ summary.ready }}</div>
+    <div>Blocked by dependencies: {{ summary.blocked_by_dependencies }}</div>
+  </div>
+
+  <h2>Ready to migrate next</h2>
+  <ul>
+  {% for name in summary.ready_names %}<li><a href="{{ url_for('library_detail', name=name) }}">{{ name }}</a></li>{% else %}<li>None</li>{% endfor %}
+  </ul>
+
+  <div class="filters">
+    {% for value in ['all','ready','blocked','done','in_progress','not_started'] %}
+      <a href="/?filter={{ value }}" class="{% if filter_by == value %}active{% endif %}">{{ value }}</a>
+    {% endfor %}
+  </div>
+
+  <table>
+    <tr><th>Library</th><th>Version</th><th>Manual status</th><th>Derived state</th><th>Internal dependencies</th><th>Blocked by</th><th>Path</th><th>Notes</th></tr>
+    {% for lib in libraries %}
+    <tr>
+      <td><a href="{{ url_for('library_detail', name=lib.name) }}">{{ lib.name }}</a></td>
+      <td>{{ lib.version or 'unknown' }}</td>
+      <td>{{ lib.status }}</td>
+      <td>{{ lib.derived_state }}</td>
+      <td>{{ ', '.join(lib.internal_dependencies) }}</td>
+      <td>{{ ', '.join(lib.blocked_by) }}</td>
+      <td>{{ lib.path }}</td>
+      <td>{{ lib.notes[:80] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</body>
+</html>

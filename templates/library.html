@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{ lib.name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <p><a href="{{ url_for('index') }}">Back</a> | <a href="{{ url_for('graph') }}">Graph</a></p>
+  {% for warn in cycle_warning %}<div class="warn">{{ warn }}</div>{% endfor %}
+  <h1>{{ lib.name }}</h1>
+  <p><b>Version:</b> {{ lib.version or 'unknown' }}</p>
+  <p><b>Path:</b> {{ lib.path }}</p>
+  <p><b>Manual status:</b> {{ lib.status }}</p>
+  <p><b>Derived state:</b> {{ lib.derived_state }}</p>
+
+  <h2>Blocked by</h2>
+  <ul>{% for dep in lib.blocked_by %}<li>{{ dep }} - {{ libraries[dep].status }}</li>{% else %}<li>None</li>{% endfor %}</ul>
+
+  <h2>Internal dependencies</h2>
+  <ul>{% for dep in lib.internal_dependencies %}<li>{{ dep }} - {{ libraries[dep].status }}</li>{% else %}<li>None</li>{% endfor %}</ul>
+
+  <h2>External dependencies</h2>
+  <ul>{% for dep in lib.external_dependencies %}<li>{{ dep }}</li>{% else %}<li>None</li>{% endfor %}</ul>
+
+  <h2>Dependents</h2>
+  <ul>{% for dep in lib.dependents %}<li><a href="{{ url_for('library_detail', name=dep) }}">{{ dep }}</a></li>{% else %}<li>None</li>{% endfor %}</ul>
+
+  <h2>Warnings</h2>
+  <ul>{% for w in lib.warnings %}<li>{{ w }}</li>{% else %}<li>None</li>{% endfor %}</ul>
+
+  <h2>Update status and notes</h2>
+  <form method="post" action="{{ url_for('update_library', name=lib.name) }}">
+    <label>Status:
+      <select name="status">
+      {% for s in statuses %}
+        <option value="{{ s }}" {% if s == lib.status %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+      </select>
+    </label>
+    <br>
+    <label>Notes:</label><br>
+    <textarea name="notes" rows="8" cols="90">{{ lib.notes }}</textarea><br>
+    <button type="submit">Save</button>
+  </form>
+</body>
+</html>
