@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Dependency Graph</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+</head>
+<body>
+  <p><a href="{{ url_for('index') }}">Back</a></p>
+  <h1>Internal Dependency Graph</h1>
+  {% for warn in cycle_warning %}<div class="warn">{{ warn }}</div>{% endfor %}
+  <pre class="mermaid">{{ mermaid }}</pre>
+</body>
+</html>
